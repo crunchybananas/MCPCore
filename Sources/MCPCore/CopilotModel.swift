@@ -11,6 +11,7 @@ import Foundation
 public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendable {
   // Claude models
   case claudeOpus46 = "claude-opus-4.6"
+  case claudeSonnet46 = "claude-sonnet-4.6"
   case claudeSonnet45 = "claude-sonnet-4.5"
   case claudeHaiku45 = "claude-haiku-4.5"
   case claudeOpus45 = "claude-opus-4.5"
@@ -181,6 +182,7 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
   }
 
   private static let metadataMap: [MCPCopilotModel: Metadata] = [
+    .claudeSonnet46: Metadata(displayName: "Claude Sonnet 4.6", shortName: "Sonnet 4.6", premiumCost: 1.0, family: .claude),
     .claudeOpus46: Metadata(displayName: "Claude Opus 4.6", shortName: "Opus 4.6", premiumCost: 3.0, family: .claude),
     .claudeSonnet45: Metadata(displayName: "Claude Sonnet 4.5", shortName: "Sonnet 4.5", premiumCost: 1.0, family: .claude),
     .claudeHaiku45: Metadata(displayName: "Claude Haiku 4.5", shortName: "Haiku 4.5", premiumCost: 0.33, family: .claude),

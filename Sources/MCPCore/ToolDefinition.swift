@@ -12,7 +12,7 @@ import Foundation
 /// Categories for MCP tools
 public enum MCPToolCategory: String, CaseIterable, Codable, Sendable {
   case chains
-  case parallelWorktrees
+  case agentRuns
   case logs
   case server
   case app
@@ -30,7 +30,7 @@ public enum MCPToolCategory: String, CaseIterable, Codable, Sendable {
   public var displayName: String {
     switch self {
     case .chains: return "Chains"
-    case .parallelWorktrees: return "Parallel Worktrees"
+    case .agentRuns: return "Agent Runs"
     case .logs: return "Logs"
     case .server: return "Server"
     case .app: return "App"

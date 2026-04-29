@@ -7,25 +7,33 @@
 
 import Foundation
 
-/// Available models for Copilot CLI
+/// Available models for Copilot CLI.
+///
+/// Raw values follow Anthropic / OpenAI canonical model IDs (dashes throughout,
+/// no dots in version numbers). `MCPCopilotModel.fromString` accepts the
+/// legacy dot format (e.g. `claude-opus-4.6`) as well so persisted state from
+/// older builds resolves correctly.
 public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendable {
-  // Claude models
-  case claudeOpus46 = "claude-opus-4.6"
-  case claudeSonnet46 = "claude-sonnet-4.6"
-  case claudeSonnet45 = "claude-sonnet-4.5"
-  case claudeHaiku45 = "claude-haiku-4.5"
-  case claudeOpus45 = "claude-opus-4.5"
+  // Claude models — newest first
+  case claudeOpus47 = "claude-opus-4-7"
+  case claudeSonnet47 = "claude-sonnet-4-7"
+  case claudeHaiku47 = "claude-haiku-4-7"
+  case claudeOpus46 = "claude-opus-4-6"
+  case claudeSonnet46 = "claude-sonnet-4-6"
+  case claudeSonnet45 = "claude-sonnet-4-5"
+  case claudeHaiku45 = "claude-haiku-4-5"
+  case claudeOpus45 = "claude-opus-4-5"
   case claudeSonnet4 = "claude-sonnet-4"
 
   // GPT models
-  case gpt51CodexMax = "gpt-5.1-codex-max"
-  case gpt51Codex = "gpt-5.1-codex"
-  case gpt52 = "gpt-5.2"
-  case gpt51 = "gpt-5.1"
+  case gpt51CodexMax = "gpt-5-1-codex-max"
+  case gpt51Codex = "gpt-5-1-codex"
+  case gpt52 = "gpt-5-2"
+  case gpt51 = "gpt-5-1"
   case gpt5 = "gpt-5"
-  case gpt51CodexMini = "gpt-5.1-codex-mini"
+  case gpt51CodexMini = "gpt-5-1-codex-mini"
   case gpt5Mini = "gpt-5-mini"
-  case gpt41 = "gpt-4.1"  // Often free/cheaper
+  case gpt41 = "gpt-4-1"
 
   // Gemini
   case gemini3Pro = "gemini-3-pro-preview"
@@ -81,7 +89,7 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
     metadata.family
   }
 
-  public enum ModelFamily: String, CaseIterable, Identifiable, Sendable {
+  public enum ModelFamily: String, Codable, Hashable, CaseIterable, Identifiable, Sendable {
     case claude
     case gpt
     case gemini
@@ -136,7 +144,7 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
     }
   }
 
-  public enum CostTier: String, Codable, Sendable {
+  public enum CostTier: String, Codable, Hashable, Sendable, CaseIterable {
     case free
     case low
     case standard
@@ -182,6 +190,9 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
   }
 
   private static let metadataMap: [MCPCopilotModel: Metadata] = [
+    .claudeOpus47: Metadata(displayName: "Claude Opus 4.7", shortName: "Opus 4.7", premiumCost: 3.0, family: .claude),
+    .claudeSonnet47: Metadata(displayName: "Claude Sonnet 4.7", shortName: "Sonnet 4.7", premiumCost: 1.0, family: .claude),
+    .claudeHaiku47: Metadata(displayName: "Claude Haiku 4.7", shortName: "Haiku 4.7", premiumCost: 0.33, family: .claude),
     .claudeSonnet46: Metadata(displayName: "Claude Sonnet 4.6", shortName: "Sonnet 4.6", premiumCost: 1.0, family: .claude),
     .claudeOpus46: Metadata(displayName: "Claude Opus 4.6", shortName: "Opus 4.6", premiumCost: 3.0, family: .claude),
     .claudeSonnet45: Metadata(displayName: "Claude Sonnet 4.5", shortName: "Sonnet 4.5", premiumCost: 1.0, family: .claude),
@@ -208,9 +219,23 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
     )
   }
 
+  /// Resolve a model from any reasonable string form:
+  ///   - canonical raw value          ("claude-opus-4-7")
+  ///   - legacy dot version           ("claude-opus-4.7")
+  ///   - display name                 ("Claude Opus 4.7")
+  ///   - short name                   ("Opus 4.7")
+  ///
+  /// Returns nil only when nothing matches.
   public static func fromString(_ value: String) -> MCPCopilotModel? {
     let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     if let direct = MCPCopilotModel(rawValue: normalized) {
+      return direct
+    }
+    // Legacy raw values carried dot-formatted version numbers
+    // (e.g. "claude-opus-4.6"). Canonical form uses dashes. Translate so
+    // persisted state from earlier MCPCore releases still resolves.
+    let canonical = normalized.replacingOccurrences(of: ".", with: "-")
+    if let direct = MCPCopilotModel(rawValue: canonical) {
       return direct
     }
     return MCPCopilotModel.allCases.first { model in

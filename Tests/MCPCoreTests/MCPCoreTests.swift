@@ -72,6 +72,59 @@ final class MCPCoreTests: XCTestCase {
     XCTAssertTrue(MCPCopilotModel.gemini3Pro.isGemini)
   }
 
+  func testCopilotModel47Family() {
+    XCTAssertEqual(MCPCopilotModel.claudeOpus47.rawValue, "claude-opus-4-7")
+    XCTAssertEqual(MCPCopilotModel.claudeOpus47.shortName, "Opus 4.7")
+    XCTAssertTrue(MCPCopilotModel.claudeOpus47.isClaude)
+    XCTAssertEqual(MCPCopilotModel.claudeSonnet47.rawValue, "claude-sonnet-4-7")
+    XCTAssertEqual(MCPCopilotModel.claudeHaiku47.rawValue, "claude-haiku-4-7")
+  }
+
+  /// Earlier MCPCore releases shipped raw values with dot-formatted version
+  /// numbers ("claude-opus-4.6"). Persisted state from those builds must
+  /// still resolve so users don't lose their model picks on upgrade.
+  func testCopilotModelLegacyDotFormatResolves() {
+    XCTAssertEqual(MCPCopilotModel.fromString("claude-opus-4.6"), .claudeOpus46)
+    XCTAssertEqual(MCPCopilotModel.fromString("claude-haiku-4.5"), .claudeHaiku45)
+    XCTAssertEqual(MCPCopilotModel.fromString("gpt-5.1-codex"), .gpt51Codex)
+    XCTAssertEqual(MCPCopilotModel.fromString("gpt-4.1"), .gpt41)
+  }
+
+  func testCopilotModelDescriptor() {
+    let opus47 = MCPCopilotModel.claudeOpus47.descriptor
+    XCTAssertEqual(opus47.id, "claude-opus-4-7")
+    XCTAssertEqual(opus47.displayName, "Claude Opus 4.7")
+    XCTAssertEqual(opus47.family, .claude)
+    XCTAssertEqual(opus47.costTier, .premium)
+    // Claude family is servable via either CLI; Copilot CLI also supports it.
+    XCTAssertTrue(opus47.providers.contains(.copilotCLI))
+    XCTAssertTrue(opus47.providers.contains(.claudeCLI))
+
+    // GPT family is Copilot-CLI only.
+    let gpt51 = MCPCopilotModel.gpt51.descriptor
+    XCTAssertEqual(gpt51.providers, [.copilotCLI])
+
+    // Builtins cover every enum case.
+    XCTAssertEqual(MCPCopilotModelDescriptor.builtins.count, MCPCopilotModel.allCases.count)
+  }
+
+  func testCopilotModelDescriptorRoundTripsJSON() throws {
+    let descriptor = MCPCopilotModelDescriptor(
+      id: "claude-opus-4-7",
+      displayName: "Claude Opus 4.7",
+      shortName: "Opus 4.7",
+      family: .claude,
+      premiumCost: 3.0,
+      providers: [.copilotCLI, .claudeCLI],
+      releasedAt: "2026-04-29",
+      deprecatedAt: nil,
+      notes: "Test entry"
+    )
+    let data = try JSONEncoder().encode(descriptor)
+    let decoded = try JSONDecoder().decode(MCPCopilotModelDescriptor.self, from: data)
+    XCTAssertEqual(decoded, descriptor)
+  }
+
   // MARK: - Chain Template Tests
 
   func testChainTemplate() {

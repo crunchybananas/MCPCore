@@ -14,10 +14,16 @@ import Foundation
 /// legacy dot format (e.g. `claude-opus-4.6`) as well so persisted state from
 /// older builds resolves correctly.
 public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendable {
-  // Claude models — newest first
-  case claudeOpus47 = "claude-opus-4-7"
-  case claudeSonnet47 = "claude-sonnet-4-7"
-  case claudeHaiku47 = "claude-haiku-4-7"
+  // Claude models — newest first.
+  //
+  // Only models Anthropic has actually shipped go here. Speculative
+  // future versions (`claude-*-4-7`, etc.) MUST NOT be added until they
+  // exist in the real CLI catalog — when listed they shadow the real
+  // newest via `recommended(for:)`, and every `model: .bestStandard`
+  // call in downstream apps reaches for a model the CLI rejects.
+  // The right pattern for "the newest" is `bestStandard` → `recommended`
+  // which prefers the first enum case in tier; new releases get added
+  // here AT release time, not before.
   case claudeOpus46 = "claude-opus-4-6"
   case claudeSonnet46 = "claude-sonnet-4-6"
   case claudeSonnet45 = "claude-sonnet-4-5"
@@ -190,9 +196,6 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
   }
 
   private static let metadataMap: [MCPCopilotModel: Metadata] = [
-    .claudeOpus47: Metadata(displayName: "Claude Opus 4.7", shortName: "Opus 4.7", premiumCost: 3.0, family: .claude),
-    .claudeSonnet47: Metadata(displayName: "Claude Sonnet 4.7", shortName: "Sonnet 4.7", premiumCost: 1.0, family: .claude),
-    .claudeHaiku47: Metadata(displayName: "Claude Haiku 4.7", shortName: "Haiku 4.7", premiumCost: 0.33, family: .claude),
     .claudeSonnet46: Metadata(displayName: "Claude Sonnet 4.6", shortName: "Sonnet 4.6", premiumCost: 1.0, family: .claude),
     .claudeOpus46: Metadata(displayName: "Claude Opus 4.6", shortName: "Opus 4.6", premiumCost: 3.0, family: .claude),
     .claudeSonnet45: Metadata(displayName: "Claude Sonnet 4.5", shortName: "Sonnet 4.5", premiumCost: 1.0, family: .claude),
@@ -220,10 +223,10 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
   }
 
   /// Resolve a model from any reasonable string form:
-  ///   - canonical raw value          ("claude-opus-4-7")
-  ///   - legacy dot version           ("claude-opus-4.7")
-  ///   - display name                 ("Claude Opus 4.7")
-  ///   - short name                   ("Opus 4.7")
+  ///   - canonical raw value          ("claude-opus-4-6")
+  ///   - legacy dot version           ("claude-opus-4.6")
+  ///   - display name                 ("Claude Opus 4.6")
+  ///   - short name                   ("Opus 4.6")
   ///
   /// Returns nil only when nothing matches.
   public static func fromString(_ value: String) -> MCPCopilotModel? {

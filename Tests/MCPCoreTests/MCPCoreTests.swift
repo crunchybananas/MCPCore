@@ -72,12 +72,12 @@ final class MCPCoreTests: XCTestCase {
     XCTAssertTrue(MCPCopilotModel.gemini3Pro.isGemini)
   }
 
-  func testCopilotModel47Family() {
-    XCTAssertEqual(MCPCopilotModel.claudeOpus47.rawValue, "claude-opus-4-7")
-    XCTAssertEqual(MCPCopilotModel.claudeOpus47.shortName, "Opus 4.7")
-    XCTAssertTrue(MCPCopilotModel.claudeOpus47.isClaude)
-    XCTAssertEqual(MCPCopilotModel.claudeSonnet47.rawValue, "claude-sonnet-4-7")
-    XCTAssertEqual(MCPCopilotModel.claudeHaiku47.rawValue, "claude-haiku-4-7")
+  func testCopilotModel46Family() {
+    XCTAssertEqual(MCPCopilotModel.claudeOpus46.rawValue, "claude-opus-4-6")
+    XCTAssertEqual(MCPCopilotModel.claudeOpus46.shortName, "Opus 4.6")
+    XCTAssertTrue(MCPCopilotModel.claudeOpus46.isClaude)
+    XCTAssertEqual(MCPCopilotModel.claudeSonnet46.rawValue, "claude-sonnet-4-6")
+    XCTAssertEqual(MCPCopilotModel.claudeHaiku45.rawValue, "claude-haiku-4-5")
   }
 
   /// Earlier MCPCore releases shipped raw values with dot-formatted version
@@ -91,14 +91,14 @@ final class MCPCoreTests: XCTestCase {
   }
 
   func testCopilotModelDescriptor() {
-    let opus47 = MCPCopilotModel.claudeOpus47.descriptor
-    XCTAssertEqual(opus47.id, "claude-opus-4-7")
-    XCTAssertEqual(opus47.displayName, "Claude Opus 4.7")
-    XCTAssertEqual(opus47.family, .claude)
-    XCTAssertEqual(opus47.costTier, .premium)
+    let opus46 = MCPCopilotModel.claudeOpus46.descriptor
+    XCTAssertEqual(opus46.id, "claude-opus-4-6")
+    XCTAssertEqual(opus46.displayName, "Claude Opus 4.6")
+    XCTAssertEqual(opus46.family, .claude)
+    XCTAssertEqual(opus46.costTier, .premium)
     // Claude family is servable via either CLI; Copilot CLI also supports it.
-    XCTAssertTrue(opus47.providers.contains(.copilotCLI))
-    XCTAssertTrue(opus47.providers.contains(.claudeCLI))
+    XCTAssertTrue(opus46.providers.contains(.copilotCLI))
+    XCTAssertTrue(opus46.providers.contains(.claudeCLI))
 
     // GPT family is Copilot-CLI only.
     let gpt51 = MCPCopilotModel.gpt51.descriptor
@@ -110,9 +110,9 @@ final class MCPCoreTests: XCTestCase {
 
   func testCopilotModelDescriptorRoundTripsJSON() throws {
     let descriptor = MCPCopilotModelDescriptor(
-      id: "claude-opus-4-7",
-      displayName: "Claude Opus 4.7",
-      shortName: "Opus 4.7",
+      id: "claude-opus-4-6",
+      displayName: "Claude Opus 4.6",
+      shortName: "Opus 4.6",
       family: .claude,
       premiumCost: 3.0,
       providers: [.copilotCLI, .claudeCLI],

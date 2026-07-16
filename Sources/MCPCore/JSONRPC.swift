@@ -385,3 +385,71 @@ public enum JSONRPCResponseBuilder {
     public static let serviceNotActive = -32070
   }
 }
+
+// MARK: - RPC Response Decoding
+
+/// Decodes JSON-RPC 2.0 response envelopes — the counterpart of
+/// `JSONRPCResponseBuilder`, kept beside it so the wire shape can never
+/// drift between encode and decode.
+///
+/// An MCP tool response built by `makeToolResult` looks like:
+///
+///   {"jsonrpc":"2.0","id":…,"result":{"content":[{"type":"text","text":"<tool JSON>"}],"isError":false}}
+///
+/// and a failure built by `makeError` carries an `error` member instead.
+/// These helpers unwrap that envelope down to the tool's own payload so
+/// callers never hand-roll the parse (independent copies drifted apart in
+/// consuming apps before this existed).
+public enum JSONRPCResponseDecoder {
+  /// The parsed JSON-RPC envelope, or nil when `responseJSON` is absent or
+  /// not a JSON object.
+  public static func envelope(from responseJSON: String?) -> [String: Any]? {
+    guard let responseJSON,
+          let data = responseJSON.data(using: .utf8),
+          let envelope = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+      return nil
+    }
+    return envelope
+  }
+
+  /// The envelope's `result` object — nil for error envelopes.
+  public static func result(from responseJSON: String?) -> [String: Any]? {
+    envelope(from: responseJSON)?["result"] as? [String: Any]
+  }
+
+  /// The envelope's JSON-RPC `error` object, if present.
+  public static func error(from responseJSON: String?) -> [String: Any]? {
+    envelope(from: responseJSON)?["error"] as? [String: Any]
+  }
+
+  /// Raw text of the first `result.content` item carrying a `text` string.
+  /// Matched on the presence of `text`, not the `type` tag — older/plain
+  /// handlers omit `type` on content items and their replies must not read
+  /// as empty.
+  public static func textPayload(from responseJSON: String?) -> String? {
+    result(from: responseJSON).flatMap(textPayload(in:))
+  }
+
+  /// The tool's own JSON payload: `textPayload` parsed as a JSON object,
+  /// falling back to the bare `result` object for tools that don't use MCP
+  /// content wrapping. nil for error envelopes and for non-JSON text — use
+  /// `textPayload` for tools that reply with plain text.
+  public static func jsonPayload(from responseJSON: String?) -> [String: Any]? {
+    guard let result = result(from: responseJSON) else { return nil }
+    guard let text = textPayload(in: result) else {
+      // No text content — tools that don't use MCP content wrapping return
+      // their payload as the bare result object.
+      return result
+    }
+    guard let textData = text.data(using: .utf8),
+          let payload = try? JSONSerialization.jsonObject(with: textData) as? [String: Any] else {
+      return nil
+    }
+    return payload
+  }
+
+  private static func textPayload(in result: [String: Any]) -> String? {
+    guard let content = result["content"] as? [[String: Any]] else { return nil }
+    return content.first(where: { $0["text"] is String })?["text"] as? String
+  }
+}

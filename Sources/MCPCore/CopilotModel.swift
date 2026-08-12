@@ -24,6 +24,9 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
   // The right pattern for "the newest" is `bestStandard` → `recommended`
   // which prefers the first enum case in tier; new releases get added
   // here AT release time, not before.
+  case claudeFable5 = "claude-fable-5"
+  case claudeOpus5 = "claude-opus-5"
+  case claudeSonnet5 = "claude-sonnet-5"
   case claudeOpus46 = "claude-opus-4-6"
   case claudeSonnet46 = "claude-sonnet-4-6"
   case claudeSonnet45 = "claude-sonnet-4-5"
@@ -196,6 +199,15 @@ public enum MCPCopilotModel: String, Codable, CaseIterable, Identifiable, Sendab
   }
 
   private static let metadataMap: [MCPCopilotModel: Metadata] = [
+    // Claude 5 family (shipped 2026): Fable is the Mythos-class tier above
+    // Opus — Fable and Opus carry the premium multiplier conservatively, so a
+    // pricing surprise can only ever be cheaper than modeled, never a silent
+    // premium burn through a `.bestStandard` binding. Sonnet 5 at 1.0 makes
+    // it the standard-tier pick (first Claude in tier by enum order), which
+    // is what un-wedges every `.bestStandard` patrol from Sonnet 4.6.
+    .claudeFable5: Metadata(displayName: "Claude Fable 5", shortName: "Fable 5", premiumCost: 3.0, family: .claude),
+    .claudeOpus5: Metadata(displayName: "Claude Opus 5", shortName: "Opus 5", premiumCost: 3.0, family: .claude),
+    .claudeSonnet5: Metadata(displayName: "Claude Sonnet 5", shortName: "Sonnet 5", premiumCost: 1.0, family: .claude),
     .claudeSonnet46: Metadata(displayName: "Claude Sonnet 4.6", shortName: "Sonnet 4.6", premiumCost: 1.0, family: .claude),
     .claudeOpus46: Metadata(displayName: "Claude Opus 4.6", shortName: "Opus 4.6", premiumCost: 3.0, family: .claude),
     .claudeSonnet45: Metadata(displayName: "Claude Sonnet 4.5", shortName: "Sonnet 4.5", premiumCost: 1.0, family: .claude),

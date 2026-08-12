@@ -175,3 +175,32 @@ final class MCPCoreTests: XCTestCase {
     XCTAssertTrue(MCPFrameworkHint.auto.instructions.isEmpty)
   }
 }
+
+// MARK: - Claude 5 family (the sonnet-4.6 wedge fix)
+
+final class Claude5FamilyTests: XCTestCase {
+
+  func testTierPicksResolveToTheFiveFamily() {
+    // The bug this pins: catalogs recommended claude-sonnet-5, fromString
+    // returned nil, and every .bestStandard binding silently wedged on
+    // Sonnet 4.6. Enum order + tier now make the 5 family the picks.
+    XCTAssertEqual(MCPCopilotModel.bestStandard, .claudeSonnet5)
+    XCTAssertEqual(MCPCopilotModel.bestPremium, .claudeFable5)
+  }
+
+  func testFromStringResolvesAllFiveFamilySpellings() {
+    XCTAssertEqual(MCPCopilotModel.fromString("claude-sonnet-5"), .claudeSonnet5)
+    XCTAssertEqual(MCPCopilotModel.fromString("claude-opus-5"), .claudeOpus5)
+    XCTAssertEqual(MCPCopilotModel.fromString("claude-fable-5"), .claudeFable5)
+    XCTAssertEqual(MCPCopilotModel.fromString("Claude Fable 5"), .claudeFable5)
+    XCTAssertEqual(MCPCopilotModel.fromString("Fable 5"), .claudeFable5)
+    XCTAssertEqual(MCPCopilotModel.fromString("Sonnet 5"), .claudeSonnet5)
+  }
+
+  func testFiveFamilyTiersAreLineageConservative() {
+    XCTAssertEqual(MCPCopilotModel.claudeSonnet5.costTier, .standard)
+    XCTAssertEqual(MCPCopilotModel.claudeOpus5.costTier, .premium)
+    XCTAssertEqual(MCPCopilotModel.claudeFable5.costTier, .premium)
+    XCTAssertTrue(MCPCopilotModel.claudeFable5.isClaude)
+  }
+}

@@ -12,11 +12,11 @@ MCPCore provides the foundational types for building MCP-based automation:
 
 ## Installation
 
-Add MCPCore as a Swift Package dependency:
+This branch prepares **2.0.0 (unreleased)**, which removes the SQLite product and re-export. See [Migration](MIGRATION.md) before upgrading a 1.x consumer. After the 2.0.0 release, add MCPCore as a Swift Package dependency:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/crunchybananas/MCPCore.git", from: "1.0.0")
+  .package(url: "https://github.com/crunchybananas/MCPCore.git", from: "2.0.0")
 ]
 ```
 
@@ -48,7 +48,7 @@ Then add `MCPCore` to your target's dependencies:
 | Tool Implementations | Actual tool logic (file ops, git, etc.) |
 | Agent Execution | CLI invocation, process management |
 | Validation Config | App-specific validation rules |
-| SwiftData Models | Persistent storage implementation |
+| Storage | Database choice, schema, migrations, and persistent storage implementation |
 | UI | Views, navigation, user interaction |
 
 ## Public API
@@ -99,11 +99,15 @@ public struct MCPChainTemplate: Identifiable, Codable {
 ### Data Persistence
 
 ```swift
+@MainActor
 public protocol MCPDataPersisting: Sendable {
   func saveRunRecord(_ record: MCPRunRecordDTO) async throws
-  func loadRunRecords(limit: Int) async throws -> [MCPRunRecordDTO]
+  func updateRunRecord(_ record: MCPRunRecordDTO) async throws
+  func getRunRecord(forChainId chainId: String) async -> MCPRunRecordDTO?
+  func getRecentRuns(limit: Int) async -> [MCPRunRecordDTO]
   func saveRunResult(_ result: MCPRunResultDTO) async throws
-  func loadRunResults(forChainId: UUID) async throws -> [MCPRunResultDTO]
+  func getResults(forChainId chainId: String) async -> [MCPRunResultDTO]
+  func deleteOldRecords(olderThan date: Date) async throws
 }
 ```
 
@@ -139,6 +143,7 @@ let template = MCPChainTemplate(
 )
 
 // Implement persistence for your app
+@MainActor
 final class MyDataStore: MCPDataPersisting {
   func saveRunRecord(_ record: MCPRunRecordDTO) async throws {
     // Save to your database
@@ -155,7 +160,7 @@ final class MyDataStore: MCPDataPersisting {
 
 ## Dependencies
 
-None. MCPCore is intentionally dependency-free to maximize portability.
+MCPCore contains only Swift sources and uses Foundation. It has no package dependencies, C targets, database implementation, SQLite re-export, or explicit SQLite/zlib linkage. `MCPDataPersisting` remains a storage-neutral contract implemented by the host app.
 
 ## License
 

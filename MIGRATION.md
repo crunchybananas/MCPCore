@@ -1,4 +1,4 @@
-# MCPCore 2.0 migration (unreleased)
+# MCPCore 2.0 migration
 
 ## Removed storage implementation
 
@@ -8,9 +8,9 @@ This is a major-version change because 1.x consumers could import `CSQLite` dire
 
 ## Consumers using only protocol types
 
-After 2.0.0 is published, change the package requirement to `from: "2.0.0"`. Keep the `MCPCore` product dependency and existing Swift imports. No persistence implementation or stored-data migration is supplied or required by this package change. Platform minimums remain macOS/iOS 26 in this cleanup.
+Change the package requirement to `from: "2.0.0"`. Keep the `MCPCore` product dependency and existing Swift imports. No persistence implementation or stored-data migration is supplied or required by this package change. Platform minimums remain macOS/iOS 26 in this cleanup.
 
-Before release, use a local package reference or an exact reviewed commit; the README's 2.0.0 version example is not resolvable until a release is tagged.
+Use the 2.0.0 tag or a later compatible release for reproducible resolution.
 
 ## Peel and RAGCore
 
@@ -20,9 +20,9 @@ Dependency audit on November 9, 2026:
 - RAGCore's published manifest requests MCPCore 1.x solely for the `CSQLite` product in its `RAGCore` and `SQLiteVec` targets.
 - Peel has direct `import CSQLite` consumers in its RAG services.
 
-These existing requirements exclude 2.0, so the existing releases continue to resolve their original storage dependency. Their source and lockfiles have not been changed in this cleanup. No release has been published.
+These existing requirements exclude 2.0, so the existing releases continue to resolve their original storage dependency. Their source and lockfiles have not been changed in this cleanup. The storage split is tagged as MCPCore 2.0.0 and RAGCore 3.0.0.
 
-The companion [RAGCore 3.0 PR](https://github.com/crunchybananas/RAGCore/pull/32) now implements the storage ownership transfer. Its tests, optimized build, and paired Swift consumer with this MCPCore branch pass. Neither major version is released yet.
+The companion [RAGCore 3.0 PR](https://github.com/crunchybananas/RAGCore/pull/32) now implements the storage ownership transfer. Its tests, optimized build, and paired Swift consumer with this MCPCore branch pass. Use the paired MCPCore 2.0.0 and RAGCore 3.0.0 tags.
 
 Before upgrading Peel:
 

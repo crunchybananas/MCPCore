@@ -12,7 +12,7 @@ MCPCore provides the foundational types for building MCP-based automation:
 
 ## Installation
 
-This branch prepares **2.0.0 (unreleased)**, which removes the SQLite product and re-export. See [Migration](MIGRATION.md) before upgrading a 1.x consumer. After the 2.0.0 release, add MCPCore as a Swift Package dependency:
+**MCPCore 2.0** removes the SQLite product and re-export. See [Migration](MIGRATION.md) before upgrading a 1.x consumer. Add MCPCore as a Swift Package dependency:
 
 ```swift
 dependencies: [

@@ -22,9 +22,11 @@ Dependency audit on November 9, 2026:
 
 These existing requirements exclude 2.0, so the existing releases continue to resolve their original storage dependency. Their source and lockfiles have not been changed in this cleanup. No release has been published.
 
+The companion [RAGCore 3.0 PR](https://github.com/crunchybananas/RAGCore/pull/32) now implements the storage ownership transfer. Its tests, optimized build, and paired Swift consumer with this MCPCore branch pass. Neither major version is released yet.
+
 Before upgrading Peel:
 
-1. Move the required SQLite implementation and extension support into RAGCore or a separately owned storage package. Preserve its license and verify static sqlite-vec registration, extension requirements, and SDK header compatibility. Simply replacing the custom implementation with Apple's system SQLite is not established as equivalent.
+1. Review the companion RAGCore change, which transfers the existing SQLite source, headers, build settings, and license without changing the implementation. Its validation covers static sqlite-vec registration, database reopen, and the transferred C sources' iOS compilation; it does not claim a full Peel/iOS application build.
 2. Remove RAGCore's MCPCore dependency if it still uses only the SQLite product. Publish a compatible storage-owning RAGCore release.
 3. Give Peel an explicit dependency on the new storage product and explicit imports wherever it relied on the old re-export. Update Peel's RAGCore, MCPCore, and local Git package requirements together; SwiftPM cannot resolve MCPCore 1.x and 2.x simultaneously under the same package identity.
 4. Run Peel's coordinated app/package builds and RAGCore's database/vector tests before updating its lockfile.

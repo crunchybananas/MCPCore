@@ -14,3 +14,5 @@ Existing compiler warnings remain: `AnyCodable.value` and `MCPToolDefinition.inp
 No Peel build or database migration was attempted. Its 1.x requirement remains unchanged; see MIGRATION.md for the RAGCore storage migration needed before a 2.x upgrade. No application was launched or restarted. No package version was published.
 
 Disk: about 165.5 GiB free before and 165.2 GiB after verification, above the 30 GiB reserve. Reused the existing ignored `.build` incremental cache, retained for subsequent package work. No disposable checkout or scratch directory was created. Compact command logs remain in `.build/sqlite-cleanup-*` and can be removed after review; no release archives were created.
+
+Follow-up: the paired consumer against RAGCore storage-ownership commit `59a2037` passed JSON-RPC round trip, SQLite 3.47.2 with FTS5/RTREE, sqlite-vec initialization, and database reopen. See [RAGCore PR 32](https://github.com/crunchybananas/RAGCore/pull/32) for its tests and reproduction source.

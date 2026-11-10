@@ -16,3 +16,7 @@ No Peel build or database migration was attempted. Its 1.x requirement remains u
 Disk: about 165.5 GiB free before and 165.2 GiB after verification, above the 30 GiB reserve. Reused the existing ignored `.build` incremental cache, retained for subsequent package work. No disposable checkout or scratch directory was created. Compact command logs remain in `.build/sqlite-cleanup-*` and can be removed after review; no release archives were created.
 
 Follow-up: the paired consumer against RAGCore storage-ownership commit `59a2037` passed JSON-RPC round trip, SQLite 3.47.2 with FTS5/RTREE, sqlite-vec initialization, and database reopen. See [RAGCore PR 32](https://github.com/crunchybananas/RAGCore/pull/32) for its tests and reproduction source.
+
+## Collection Closet compatibility — 2.0.1
+
+November 9, 2026: lowered the unnecessary OS 26 package minimums to macOS 14/iOS 17; no runtime API changes. All 28 package tests pass. The complete module passes `swiftc -typecheck` for `arm64-apple-macosx14.0` and `arm64-apple-ios17.0` against the installed Apple SDKs. These are deployment-target compile checks, not runtime tests on older devices. Existing Swift 5 Sendable warnings remain. Incremental `.build` cache reused.

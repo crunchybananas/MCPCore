@@ -10,6 +10,10 @@ MCPCore provides the foundational types for building MCP-based automation:
 - **Chain templates** for multi-agent workflows
 - **Data transfer objects** for persistence abstraction
 
+## Supported platforms
+
+MCPCore 2.0.1 supports macOS 14 and iOS 17 or later. The Foundation-only protocol and domain types do not require OS 26.
+
 ## Installation
 
 **MCPCore 2.0** removes the SQLite product and re-export. See [Migration](MIGRATION.md) before upgrading a 1.x consumer. Add MCPCore as a Swift Package dependency:
